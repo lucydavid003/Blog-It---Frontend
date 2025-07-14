@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { useCookies } from "react-cookie";
 
 const Navbar: React.FC = () => {
-  const [cookies, setCookie, removeCookie] = useCookies(['authToken']);
+  const [cookies, , removeCookie] = useCookies(['authToken']);
   const handleLogout = () => {
     removeCookie('authToken')
   }
