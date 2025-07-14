@@ -8,7 +8,7 @@ import {
   Stack,
   Link as MuiLink,
 } from "@mui/material";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "../api/axios";
@@ -25,7 +25,7 @@ function Login() {
   const navigate = useNavigate();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
-  const [formError, setFormError] = useState("");
+  const [, setFormError] = useState("");
 
   const { isPending, mutate } = useMutation({
     mutationKey: ["login user"],
