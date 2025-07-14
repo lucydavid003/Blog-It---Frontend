@@ -14,9 +14,7 @@ import axios from "axios";
 import axiosInstance from "../api/axios";
 import { useMutation } from "@tanstack/react-query";
 
-
 interface NewBlog {
-  
   title: string;
   featuredImg: string;
   content: string;
@@ -24,47 +22,65 @@ interface NewBlog {
 }
 
 function CreateBlog() {
-
-  const { isPending, mutate } = useMutation({
-    mutationKey: ["Create-Blog"],
-    mutationFn: async (blog: NewBlog) => {
-      const res = await axiosInstance.post("/blogs", blog);
-      console.log(res.data);
-      return res.data;
-    },
-    onSuccess: () => {
-    navigate("/blogs"); 
-  },
-  onError: (err) => {
-    if (axios.isAxiosError(err)) {
-      setFormError(err.response?.data.message || "Something went wrong");
-    } else {
-      setFormError("Something went wrong");
-    }
-  },
-  });
-
   const [title, setTitle] = useState("");
   const [featuredImg, setFeaturedImg] = useState("");
   const [synopsis, setSynopsis] = useState("");
   const [content, setContent] = useState("");
   const [formError, setFormError] = useState("");
+  const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
+
+  const handleImageUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append("image", file);
+    try {
+      setUploading(true);
+      const res = await axiosInstance.post("/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setFeaturedImg(res.data.imageUrl);
+    } catch (error) {
+      setFormError("Image upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const { isPending, mutate } = useMutation({
+    mutationKey: ["Create-Blog"],
+    mutationFn: async (blog: NewBlog) => {
+      const res = await axiosInstance.post("/blogs", blog);
+      return res.data;
+    },
+    onSuccess: () => {
+      navigate("/blogs");
+    },
+    onError: (err) => {
+      if (axios.isAxiosError(err)) {
+        setFormError(err.response?.data.message || "Something went wrong");
+      } else {
+        setFormError("Something went wrong");
+      }
+    },
+  });
 
   async function handleSubmit() {
     setFormError("");
+
+    if (!title || !synopsis || !content || !featuredImg) {
+      setFormError("All fields including image are required");
+      return;
+    }
+
     const newBlog = {
       title,
       featuredImg,
       synopsis,
       content,
     };
-    mutate(newBlog);
-    
-   
 
-      
-    } 
+    mutate(newBlog);
+  }
 
   return (
     <Box component={"section"} mt={2}>
@@ -77,6 +93,7 @@ function CreateBlog() {
       >
         Create a new blog
       </Typography>
+
       <Grid container justifyContent={"center"}>
         <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4, xl: 4 }}>
           <Paper component={"form"} sx={{ p: 2 }}>
@@ -90,14 +107,27 @@ function CreateBlog() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
-              <TextField
-                label="Featured Image URL"
-                type="text"
-                fullWidth
-                required
-                value={featuredImg}
-                onChange={(e) => setFeaturedImg(e.target.value)}
-              />
+
+              <Button variant="outlined" component="label" disabled={uploading}>
+                {uploading ? "Uploading..." : "Upload Featured Image"}
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      handleImageUpload(e.target.files[0]);
+                    }
+                  }}
+                />
+              </Button>
+
+              {featuredImg && (
+                <Typography variant="caption" color="green">
+                  Image uploaded successfully!
+                </Typography>
+              )}
+
               <TextField
                 label="Synopsis"
                 type="text"
@@ -118,9 +148,9 @@ function CreateBlog() {
               <Button
                 variant="contained"
                 onClick={handleSubmit}
-                loading={isPending}
+                disabled={isPending || uploading}
               >
-                Submit Blog
+                {isPending ? "Submitting..." : "Submit Blog"}
               </Button>
             </Stack>
           </Paper>

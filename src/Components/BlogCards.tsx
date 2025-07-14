@@ -1,7 +1,6 @@
 import {
   Card,
   CardContent,
-  CardMedia,
   Typography,
   CardActions,
   Button,
@@ -9,6 +8,9 @@ import {
   Box,
 } from "@mui/material";
 import { Link } from "react-router-dom";
+import { Cloudinary } from "@cloudinary/url-gen";
+import { AdvancedImage } from "@cloudinary/react";
+import { fill } from "@cloudinary/url-gen/actions/resize";
 
 interface BlogCardProps {
   blog: {
@@ -16,20 +18,33 @@ interface BlogCardProps {
     title: string;
     synopsis: string;
     featuredImg: string;
-    authorname:string 
-      
-
+    isDeleted: boolean;
+    authorname: string;
   };
 }
 
 function BlogCard({ blog }: BlogCardProps) {
-  const { id, title, synopsis, featuredImg, authorname } = blog;
+  const { id, title, synopsis, featuredImg, isDeleted, authorname } = blog;
 
-  const initials = {authorname};
+  if (isDeleted) return null;
+
+  const initials = authorname
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
+
+  const cld = new Cloudinary({
+    cloud: { cloudName: "drsnqcita" },
+  });
+
+  const img = cld.image(featuredImg);
+  img.resize(fill().width(300).height(200));
 
   return (
-    <Card sx={{ maxWidth: 345 }}>
-      <CardMedia component="img" height="180" image={featuredImg} alt={title} />
+    <Card sx={{ maxWidth: 345, margin: 2 }}>
+      <AdvancedImage cldImg={img} />
+
       <CardContent>
         <Typography variant="h5" component="div" gutterBottom>
           {title}
@@ -37,26 +52,28 @@ function BlogCard({ blog }: BlogCardProps) {
         <Typography variant="body2" color="text.secondary">
           {synopsis}
         </Typography>
+
         <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-          <Avatar>{initials.authorname}</Avatar>
+          <Avatar>{initials}</Avatar>
           <Typography variant="subtitle2" sx={{ ml: 1 }}>
             {authorname}
           </Typography>
         </Box>
       </CardContent>
+
       <CardActions>
         <Button
           size="small"
           component={Link}
-          to={"/blogs/"}
+          to={`/blogs/${id}`}
           variant="outlined"
-          sx={{ color: "blueviolet" }}>
-            </Button>
+          sx={{ color: "red" }}
+        >
+          Read More
+        </Button>
+      </CardActions>
+    </Card>
+  );
+}
 
-            </CardActions>
-            </Card>
-      
-  
-
-);}
-export default BlogCard;
+export default BlogCard;

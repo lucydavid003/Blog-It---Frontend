@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import ReactMarkdown from "react-markdown";
 import {
   Grid,
   Container,
@@ -17,6 +18,7 @@ interface Blog {
   synopsis: string;
   featuredImg: string;
   authorname: string;
+  isDeleted: boolean; 
 }
 
 function Blogs() {
@@ -56,11 +58,13 @@ function Blogs() {
       )}
 
       <Grid container spacing={4}>
-        {blogs?.map((blog) => (
-          <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4, xl: 4 }} key={blog.id}>
-            <BlogCard blog={blog} />
-          </Grid>
-        ))}
+        {blogs
+          ?.filter((blog) => !blog.isDeleted) 
+          .map((blog) => (
+            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4, xl: 4 }} key={blog.id}>
+              <BlogCard blog={blog} />
+            </Grid>
+          ))}
       </Grid>
     </Container>
   );
