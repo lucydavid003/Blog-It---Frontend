@@ -12,6 +12,7 @@ import {
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../api/axios";
 
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
@@ -37,8 +38,8 @@ function Register() {
   const { isPending, mutate } = useMutation({
     mutationKey: ["register-user"],
     mutationFn: async (newUser: User) => {
-      const response = await axios.post(
-        "http://localhost:4000/auth/register",
+      const response = await axiosInstance.post(
+        "auth/register",
         newUser
       );
       console.log(response);
