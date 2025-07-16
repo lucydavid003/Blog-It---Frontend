@@ -6,11 +6,10 @@ import {
   Button,
   Avatar,
   Box,
+  CardMedia,
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import { Cloudinary } from "@cloudinary/url-gen";
-import { AdvancedImage } from "@cloudinary/react";
-import { fill } from "@cloudinary/url-gen/actions/resize";
+
 
 interface BlogCardProps {
   blog: {
@@ -19,32 +18,22 @@ interface BlogCardProps {
     synopsis: string;
     featuredImg: string;
     isDeleted: boolean;
-    authorname: string;
+    authorName: string;
   };
 }
 
 function BlogCard({ blog }: BlogCardProps) {
-  const { id, title, synopsis, featuredImg, isDeleted, authorname } = blog;
+  const { id, title, synopsis, featuredImg, isDeleted, authorName } = blog;
 
   if (isDeleted) return null;
 
-  const initials = authorname
-    .split(" ")
-    .map((word) => word[0])
-    .join("")
-    .toUpperCase();
+  const initials = authorName.split(" ").map((n)=>n[0]).join('');
 
-  const cld = new Cloudinary({
-    cloud: { cloudName: "drsnqcita" },
-  });
 
-  const img = cld.image(featuredImg);
-  img.resize(fill().width(300).height(200));
-
+ 
   return (
     <Card sx={{ maxWidth: 345, margin: 2 }}>
-      <AdvancedImage cldImg={img} />
-
+      <CardMedia sx={{height:200}} image={featuredImg}/>
       <CardContent>
         <Typography variant="h5" component="div" gutterBottom>
           {title}
@@ -56,7 +45,7 @@ function BlogCard({ blog }: BlogCardProps) {
         <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
           <Avatar>{initials}</Avatar>
           <Typography variant="subtitle2" sx={{ ml: 1 }}>
-            {authorname}
+            {authorName}
           </Typography>
         </Box>
       </CardContent>

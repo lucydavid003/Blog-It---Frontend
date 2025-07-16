@@ -16,7 +16,7 @@ interface Blog {
   title: string;
   synopsis: string;
   featuredImg: string;
-  authorname: string;
+  authorName: string;
   isDeleted: boolean; 
 }
 
@@ -31,6 +31,7 @@ function Blogs() {
       const response = await axiosInstance.get("/blogs", {
         withCredentials: true,
       });
+     
       return response.data;
     },
   });

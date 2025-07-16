@@ -48,7 +48,7 @@ function Profile() {
   } } = useQuery<User>({
     queryKey: ["user"],
     queryFn: async () => {
-      const res = await axiosInstance.get("/user/me");
+      const res = await axiosInstance.get("/users/me");
       return res.data;
     },
   });
